@@ -1,0 +1,213 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEXORA FX | Forex Bot Store</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#080d18;color:#fff;font-family:Arial,sans-serif}
+header{padding:22px 6%;display:flex;justify-content:space-between;align-items:center;background:#101a2b;border-bottom:1px solid #26364d}
+.logo{font-size:25px;font-weight:bold;color:#39c6ff}
+button{background:#087fbd;color:white;border:0;padding:12px 19px;border-radius:8px;cursor:pointer;font-weight:bold}
+button:hover{background:#079eea}
+.hero{text-align:center;padding:65px 20px;background:linear-gradient(130deg,#10243d,#080d18)}
+.hero h1{font-size:38px;color:#39c6ff}
+.hero p{color:#b9c8d9;line-height:1.7}
+section{padding:35px 6%}
+h2{color:#39c6ff}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:20px}
+.card,.panel{background:#121e30;border:1px solid #263b57;border-radius:13px;padding:18px}
+.card img{width:100%;height:170px;object-fit:cover;border-radius:9px}
+.card h3{color:#43caff}
+.muted{color:#aab9cc;line-height:1.6}
+.details{display:none;background:#101a2b;padding:25px;border-radius:12px;margin-top:20px}
+.details img{width:100%;max-height:360px;object-fit:contain;border-radius:10px}
+.gallery{display:flex;gap:10px;align-items:center;justify-content:center;margin:15px}
+.gallery button{padding:10px 16px}
+input,textarea{width:100%;padding:12px;margin:7px 0 14px;background:#091321;color:white;border:1px solid #344b67;border-radius:7px}
+label{color:#b9c8d9}
+#login,#admin{display:none;max-width:600px;margin:30px auto;padding:20px}
+footer{text-align:center;background:#101a2b;padding:30px;color:#aab9cc}
+a{color:#39c6ff;text-decoration:none;margin:8px}
+.social{padding:20px;text-align:center}
+.small{font-size:13px;color:#91a5bd}
+</style>
+</head>
+<body>
+
+<header>
+<div class="logo">NEXORA FX</div>
+<button onclick="showLogin()">Customer Login</button>
+</header>
+
+<div class="hero">
+<h1>WELCOME TO NEXORA FX</h1>
+<p>Professional Forex Trading Bot Solutions<br>
+Explore our Bots, Features and Performance.</p>
+<button onclick="document.getElementById('products').scrollIntoView()">Explore Bots</button>
+</div>
+
+<section id="products">
+<h2>Our Trading Bots</h2>
+<p class="muted">Choose a bot to view its features, gallery and details.</p>
+<div class="grid" id="botList"></div>
+<div class="details" id="details">
+<h2 id="detailName"></h2>
+<p class="muted" id="detailDescription"></p>
+<img id="galleryImage" alt="Bot gallery image">
+<div class="gallery">
+<button onclick="changeImage(-1)">Previous</button>
+<span id="imageCount"></span>
+<button onclick="changeImage(1)">Next</button>
+</div>
+<p id="detailInfo" class="muted"></p>
+<button onclick="contactTelegram()">Buy / Contact on Telegram</button>
+</div>
+</section>
+
+<section id="login">
+<div class="panel">
+<h2>Customer Login</h2>
+<label>Email Address</label>
+<input type="email" id="customerEmail" placeholder="Enter your email">
+<button onclick="customerLogin()">Continue</button>
+<p class="small">Demo login interface. Secure account authentication will be connected in the next setup stage.</p>
+</div>
+</section>
+
+<section id="admin">
+<div class="panel">
+<h2>Admin Panel - Add Bot</h2>
+<label>Bot Name</label>
+<input id="botName" placeholder="Example: NEXORA GOLD BOT">
+<label>Description</label>
+<textarea id="botDescription" placeholder="Write bot details"></textarea>
+<label>Stop Loss</label>
+<input id="botSL" placeholder="Example: Adjustable">
+<label>Profit Target</label>
+<input id="botTP" placeholder="Example: Configurable">
+<label>Bot Price</label>
+<input id="botPrice" placeholder="Enter price">
+<label>Bot Gallery Images (select multiple)</label>
+<input type="file" id="botImages" accept="image/*" multiple>
+<button onclick="addBot()">Add Bot</button>
+<p class="small">This is a local demo panel. Real admin authentication and permanent image storage will be added with the database.</p>
+</div>
+</section>
+
+<div class="social">
+<h2>Contact & Social Media</h2>
+<a id="telegramLink" href="https://t.me/" target="_blank">Telegram</a>
+<a id="youtubeLink" href="#" target="_blank">YouTube</a>
+<a id="facebookLink" href="#" target="_blank">Facebook</a>
+</div>
+
+<footer>
+<strong>NEXORA FX</strong><br>
+<p>Forex Bot Store | Contact us for Bot Information</p>
+<p class="small">Trading involves risk. Profit is not guaranteed.</p>
+</footer>
+
+<script>
+let bots = [{
+ name:"NEXORA GOLD BOT",
+ description:"Professional Forex Expert Advisor. Contact us for complete product information.",
+ sl:"Configurable",
+ tp:"Configurable",
+ price:"Contact for price",
+ images:[]
+}];
+
+let currentBot=null;
+let currentImage=0;
+
+function renderBots(){
+ const list=document.getElementById("botList");
+ list.innerHTML="";
+ bots.forEach((bot,i)=>{
+  const card=document.createElement("div");
+  card.className="card";
+  const img=document.createElement("img");
+  img.alt=bot.name;
+  img.src=bot.images[0] || "https://placehold.co/600x350/12243b/39c6ff?text=NEXORA+FX";
+  const name=document.createElement("h3");
+  name.textContent=bot.name;
+  const desc=document.createElement("p");
+  desc.className="muted";
+  desc.textContent=bot.description;
+  const price=document.createElement("p");
+  price.textContent=bot.price;
+  const btn=document.createElement("button");
+  btn.textContent="View Details";
+  btn.onclick=()=>openBot(i);
+  card.append(img,name,desc,price,btn);
+  list.appendChild(card);
+ });
+}
+
+function openBot(i){
+ currentBot=i;
+ currentImage=0;
+ const b=bots[i];
+ document.getElementById("details").style.display="block";
+ document.getElementById("detailName").textContent=b.name;
+ document.getElementById("detailDescription").textContent=b.description;
+ document.getElementById("detailInfo").textContent=
+ "Stop Loss: "+b.sl+" | Profit Target: "+b.tp+" | Price: "+b.price;
+ showImage();
+ document.getElementById("details").scrollIntoView({behavior:"smooth"});
+}
+
+function showImage(){
+ const imgs=bots[currentBot].images;
+ document.getElementById("galleryImage").src=
+ imgs[currentImage] || "https://placehold.co/800x450/12243b/39c6ff?text=NEXORA+FX";
+ document.getElementById("imageCount").textContent=
+ (currentImage+1)+" / "+Math.max(1,imgs.length);
+}
+
+function changeImage(direction){
+ const imgs=bots[currentBot].images;
+ if(!imgs.length)return;
+ currentImage=(currentImage+direction+imgs.length)%imgs.length;
+ showImage();
+}
+
+function showLogin(){
+ document.getElementById("login").style.display="block";
+ document.getElementById("login").scrollIntoView({behavior:"smooth"});
+}
+
+function customerLogin(){
+ const email=document.getElementById("customerEmail").value;
+ if(!email.includes("@")){alert("Enter a valid email");return;}
+ alert("Login system will be connected securely in the next setup stage.");
+}
+
+function contactTelegram(){
+ window.open(document.getElementById("telegramLink").href,"_blank");
+}
+
+function addBot(){
+ const name=document.getElementById("botName").value.trim();
+ if(!name){alert("Enter bot name");return;}
+ const files=[...document.getElementById("botImages").files];
+ const images=files.map(file=>URL.createObjectURL(file));
+ bots.push({
+  name,
+  description:document.getElementById("botDescription").value,
+  sl:document.getElementById("botSL").value,
+  tp:document.getElementById("botTP").value,
+  price:document.getElementById("botPrice").value,
+  images
+ });
+ renderBots();
+ alert("Bot added to this demo preview.");
+}
+
+renderBots();
+</script>
+</body>
+</html>
